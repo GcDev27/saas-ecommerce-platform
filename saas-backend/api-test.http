@@ -1,0 +1,26 @@
+### Criar nova loja
+POST http://localhost:8080/api/v1/tenants
+Content-Type: application/json
+
+{
+  "name": "Minha Super Loja",
+  "slug": "minha-super-loja"
+}
+
+### Buscar loja pelo slug
+GET http://127.0.0.1:8080/api/v1/tenants/minha-super-loja
+
+### Cadastrar um Produto na Loja
+POST http://127.0.0.1:8080/api/v1/tenants/minha-super-loja/products
+Content-Type: application/json
+
+{
+  "name": "Teclado Mecânico Gamer",
+  "description": "Switch marrom, formato TKL, anti-ghosting",
+  "price": 250.00
+}
+
+###
+
+### Listar a Vitrine da Loja (O que o Next.js vai consumir)
+GET http://127.0.0.1:8080/api/v1/tenants/minha-super-loja/products
