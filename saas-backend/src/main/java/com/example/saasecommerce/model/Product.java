@@ -1,7 +1,9 @@
 package com.example.saasecommerce.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -9,8 +11,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "products")
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -26,36 +27,24 @@ public class Product {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
 
-    // --- CAMPOS AVANÇADOS DO PRODUTO ---
-
-    @Column(name = "slug", unique = true)
     private String slug;
 
-    // O default ensina o banco a preencher os produtos antigos com "Visível na loja"
-    @Column(nullable = false, columnDefinition = "varchar(255) default 'Visível na loja'")
     private String visibility;
 
-    // O default false previne o erro de valores nulos nos produtos antigos
-    @Column(nullable = false, columnDefinition = "boolean default false")
+    @Column(name = "has_stock")
     private boolean hasStock;
 
-    @Column
+    @Column(name = "stock_quantity")
     private Integer stockQuantity;
 
-    // ------------------------------------
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "tenant_id", nullable = false)
-    private Tenant tenant;
-
-    @Column(nullable = false, updatable = false)
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-    }
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "tenant_id")
+    @JsonIgnore // A mágica que impede o Jackson de estoirar ao ler o Lazy Loading do Hibernate
+    private Tenant tenant;
 }
