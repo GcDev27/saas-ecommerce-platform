@@ -28,9 +28,11 @@ export default function EditarProduto() {
   useEffect(() => {
     if (!produtoId) return;
 
-    fetch(`http://localhost:8081/api/produtos/${produtoId}`, {
+    const token = localStorage.getItem("saas_token");
+
+    fetch(`http://localhost:8081/api/admin/produtos/${produtoId}`, {
       method: "GET",
-      headers: { "X-Tenant-Slug": "minha-super-loja" },
+      headers: { "Authorization": `Bearer ${token}` },
     })
       .then((res) => {
         if (!res.ok) throw new Error("Produto não encontrado");
@@ -70,11 +72,12 @@ export default function EditarProduto() {
     };
 
     try {
+      const token = localStorage.getItem("saas_token");
       // Método PUT para atualizar na rota com o ID
-      const res = await fetch(`http://localhost:8081/api/produtos/${produtoId}`, {
+      const res = await fetch(`http://localhost:8081/api/admin/produtos/${produtoId}`, {
         method: "PUT",
         headers: {
-          "X-Tenant-Slug": "minha-super-loja",
+          "Authorization": `Bearer ${token}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(productData),

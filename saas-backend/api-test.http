@@ -4,7 +4,7 @@ Content-Type: application/json
 
 {
   "name": "Giancarlo",
-  "email": "admin@minhaloja.com",
+  "email": "admin@minhasloja.com",
   "password": "senha-super-segura"
 }
 

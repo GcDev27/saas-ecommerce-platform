@@ -38,11 +38,12 @@ export default function NovoProduto() {
     };
 
     try {
+      const token = localStorage.getItem("saas_token");
       // Rota CORRIGIDA apontando para a porta do teu Spring Boot
-      const res = await fetch("http://localhost:8081/api/produtos", {
+      const res = await fetch("http://localhost:8081/api/admin/produtos", {
         method: "POST",
         headers: {
-          "X-Tenant-Slug": "minha-super-loja",
+          "Authorization": `Bearer ${token}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(productData),

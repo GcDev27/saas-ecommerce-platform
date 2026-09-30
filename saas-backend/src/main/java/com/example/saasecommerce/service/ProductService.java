@@ -17,40 +17,26 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final TenantService tenantService;
 
-    // Criar (CREATE)
-    public Product createProduct(String tenantSlug, String name, String description, BigDecimal price, String slug, String visibility, boolean hasStock, Integer stockQuantity) {
-        Tenant tenant = tenantService.getTenantBySlug(tenantSlug);
-
-        Product product = Product.builder()
-                .name(name)
-                .description(description)
-                .price(price)
-                .slug(slug)
-                .visibility(visibility)
-                .hasStock(hasStock)
-                .stockQuantity(stockQuantity)
-                .tenant(tenant)
-                .build();
-
+    // Criar (CREATE) - Admin Seguro
+    public Product createProduct(Tenant tenant, Product product) {
+        product.setTenant(tenant);
         return productRepository.save(product);
     }
 
-    // Ler / Listar (READ)
-    public List<Product> getProductsByTenant(String tenantSlug) {
-        Tenant tenant = tenantService.getTenantBySlug(tenantSlug);
+    // Ler / Listar (READ) - Admin Seguro
+    public List<Product> getProductsByTenant(Tenant tenant) {
         return productRepository.findAllByTenantId(tenant.getId());
     }
-    // Ler um único produto por ID
-    public Product getProductById(UUID id, String tenantSlug) {
-        return productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
-    }
-    // Atualizar (UPDATE)
-    public Product updateProduct(UUID id, String tenantSlug, Product detalhes) {
-        Product produto = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
 
-        // Em um cenário real mais rigoroso, verificaríamos se o produto pertence ao tenantSlug aqui
+    // Ler um único produto por ID - Admin Seguro
+    public Product getProductById(UUID id, Tenant tenant) {
+        return productRepository.findByIdAndTenantId(id, tenant.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Produto não encontrado ou não pertence a esta loja"));
+    }
+
+    // Atualizar (UPDATE) - Admin Seguro
+    public Product updateProduct(UUID id, Tenant tenant, Product detalhes) {
+        Product produto = getProductById(id, tenant); // Já verifica se pertence ao tenant!
 
         produto.setName(detalhes.getName());
         produto.setDescription(detalhes.getDescription());
@@ -63,8 +49,9 @@ public class ProductService {
         return productRepository.save(produto);
     }
 
-    // Apagar (DELETE)
-    public void deleteProduct(UUID id, String tenantSlug) {
-        productRepository.deleteById(id);
+    // Apagar (DELETE) - Admin Seguro
+    public void deleteProduct(UUID id, Tenant tenant) {
+        Product produto = getProductById(id, tenant); // Garante que pertence
+        productRepository.delete(produto);
     }
 }

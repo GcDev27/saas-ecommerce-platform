@@ -12,4 +12,7 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
 
     // Regra de Isolamento: Retorna os produtos filtrando pelo ID do lojista
     List<Product> findAllByTenantId(UUID tenantId);
+    
+    // Busca segura garantindo que o produto pertence ao tenant
+    java.util.Optional<Product> findByIdAndTenantId(UUID id, UUID tenantId);
 }

@@ -10,11 +10,13 @@ export default function ProdutosPage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
+    const token = localStorage.getItem("saas_token");
+    
     // Rota NOVA e corrigida apontando para o Spring Boot
-    fetch("http://localhost:8081/api/produtos", {
+    fetch("http://localhost:8081/api/admin/produtos", {
       method: "GET",
       headers: {
-        "X-Tenant-Slug": "minha-super-loja",
+        "Authorization": `Bearer ${token}`,
         "Content-Type": "application/json",
       },
     })
