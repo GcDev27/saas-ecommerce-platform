@@ -64,7 +64,7 @@ export default function DashboardVisaoGeral() {
           <motion.div key={idx} variants={itemAnim}>
             <div className="bg-[#171717] border border-neutral-800 rounded-2xl p-6 relative overflow-hidden group hover:border-neutral-700 transition-colors h-full">
               {/* Efeito de brilho de fundo no hover */}
-              <div className="absolute inset-0 bg-gradient-to-br from-violet-600/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <div className="absolute inset-0 bg-linear-to-br from-violet-600/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
               
               <h3 className="text-neutral-400 text-sm font-medium mb-2">{metrica.titulo}</h3>
               <div className="flex items-end justify-between mt-4">

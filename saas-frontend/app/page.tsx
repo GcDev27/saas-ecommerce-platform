@@ -9,7 +9,7 @@ type Product = {
 // Função para buscar os dados no Spring Boot
 async function getProducts() {
   // Atualiza para o novo endpoint da porta 8080
-  const res = await fetch('http://localhost:8080/api/produtos', {
+  const res = await fetch('http://localhost:8081/api/produtos', {
     method: 'GET',
     headers: {
       'X-Tenant-Slug': 'minha-super-loja',
@@ -45,7 +45,7 @@ export default async function Home() {
             <div key={product.id} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
               
               <h2 className="text-xl font-semibold text-gray-800">{product.name}</h2>
-              <p className="text-gray-500 mt-2 text-sm leading-relaxed min-h-[40px]">
+              <p className="text-gray-500 mt-2 text-sm leading-relaxed min-h-10">
                 {product.description}
               </p>
               

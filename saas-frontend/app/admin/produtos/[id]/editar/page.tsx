@@ -28,7 +28,7 @@ export default function EditarProduto() {
   useEffect(() => {
     if (!produtoId) return;
 
-    fetch(`http://localhost:8080/api/produtos/${produtoId}`, {
+    fetch(`http://localhost:8081/api/produtos/${produtoId}`, {
       method: "GET",
       headers: { "X-Tenant-Slug": "minha-super-loja" },
     })
@@ -71,7 +71,7 @@ export default function EditarProduto() {
 
     try {
       // Método PUT para atualizar na rota com o ID
-      const res = await fetch(`http://localhost:8080/api/produtos/${produtoId}`, {
+      const res = await fetch(`http://localhost:8081/api/produtos/${produtoId}`, {
         method: "PUT",
         headers: {
           "X-Tenant-Slug": "minha-super-loja",

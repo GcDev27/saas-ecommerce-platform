@@ -39,7 +39,7 @@ export default function NovoProduto() {
 
     try {
       // Rota CORRIGIDA apontando para a porta do teu Spring Boot
-      const res = await fetch("http://localhost:8080/api/produtos", {
+      const res = await fetch("http://localhost:8081/api/produtos", {
         method: "POST",
         headers: {
           "X-Tenant-Slug": "minha-super-loja",

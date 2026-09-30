@@ -126,13 +126,13 @@ function ToastItem({ toast, onRemove }: { toast: Toast; onRemove: (id: number) =
       className={`
         relative flex items-center gap-3 px-4 py-3.5 rounded-xl border shadow-2xl
         backdrop-blur-xl cursor-grab active:cursor-grabbing select-none
-        min-w-[320px] max-w-[420px]
+        min-w-[320px] max-w-105
         ${styles.bg} ${styles.border}
       `}
       style={{ touchAction: "none" }}
     >
       {/* Icon */}
-      <div className={`flex-shrink-0 ${styles.icon}`}>
+      <div className={`shrink-0 ${styles.icon}`}>
         <Icon />
       </div>
 
@@ -142,7 +142,7 @@ function ToastItem({ toast, onRemove }: { toast: Toast; onRemove: (id: number) =
       {/* Close button */}
       <button
         onClick={() => onRemove(toast.id)}
-        className="flex-shrink-0 text-neutral-500 hover:text-white transition-colors p-0.5"
+        className="shrink-0 text-neutral-500 hover:text-white transition-colors p-0.5"
       >
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <line x1="18" y1="6" x2="6" y2="18" />
@@ -152,7 +152,7 @@ function ToastItem({ toast, onRemove }: { toast: Toast; onRemove: (id: number) =
 
       {/* Progress bar */}
       <motion.div
-        className={`absolute bottom-0 left-0 h-[2px] rounded-b-xl ${styles.progress}`}
+        className={`absolute bottom-0 left-0 h-0.5 rounded-b-xl ${styles.progress}`}
         initial={{ width: "100%" }}
         animate={{ width: "0%" }}
         transition={{ duration: TOAST_DURATION / 1000, ease: "linear" }}
@@ -182,7 +182,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
       {children}
 
       {/* Toast Container - Bottom Right */}
-      <div className="fixed bottom-6 right-6 z-[100] flex flex-col gap-3 items-end pointer-events-none">
+      <div className="fixed bottom-6 right-6 z-100 flex flex-col gap-3 items-end pointer-events-none">
         <AnimatePresence mode="popLayout">
           {toasts.map((toast) => (
             <div key={toast.id} className="pointer-events-auto">

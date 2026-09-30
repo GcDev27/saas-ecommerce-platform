@@ -1,26 +1,32 @@
-### Criar nova loja
-POST http://localhost:8080/api/v1/tenants
+### 1. Criar uma nova conta (Registo)
+POST http://localhost:8081/api/auth/register
 Content-Type: application/json
 
 {
-  "name": "Minha Super Loja",
-  "slug": "minha-super-loja"
+  "name": "Giancarlo",
+  "email": "admin@minhaloja.com",
+  "password": "senha-super-segura"
 }
 
-### Buscar loja pelo slug
-GET http://127.0.0.1:8080/api/v1/tenants/minha-super-loja
-
-### Cadastrar um Produto na Loja
-POST http://127.0.0.1:8080/api/v1/tenants/minha-super-loja/products
+### 2. Fazer Login
+POST http://localhost:8081/api/auth/login
 Content-Type: application/json
 
 {
-  "name": "Teclado Mecânico Gamer",
-  "description": "Switch marrom, formato TKL, anti-ghosting",
-  "price": 250.00
+  "email": "admin@minhaloja.com",
+  "password": "senha-super-segura"
+}
+### 3. Cadastrar Produto na Loja (Seguro)
+POST http://localhost:8081/api/produtos
+Content-Type: application/json
+Authorization: Bearer COLA_AQUI_O_TEU_TOKEN_GIGANTE
+
+{
+  "name": "E-book: Como Programar em Java",
+  "description": "Aprende Spring Boot do zero",
+  "price": 49.90
 }
 
-###
-
-### Listar a Vitrine da Loja (O que o Next.js vai consumir)
-GET http://127.0.0.1:8080/api/v1/tenants/minha-super-loja/products
+### 4. Listar Produtos da Minha Loja (Seguro)
+GET http://localhost:8081/api/produtos
+Authorization: Bearer COLA_AQUI_O_TEU_TOKEN_GIGANTE

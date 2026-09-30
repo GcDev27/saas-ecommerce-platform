@@ -11,7 +11,7 @@ export default function ProdutosPage() {
 
   useEffect(() => {
     // Rota NOVA e corrigida apontando para o Spring Boot
-    fetch("http://localhost:8080/api/produtos", {
+    fetch("http://localhost:8081/api/produtos", {
       method: "GET",
       headers: {
         "X-Tenant-Slug": "minha-super-loja",

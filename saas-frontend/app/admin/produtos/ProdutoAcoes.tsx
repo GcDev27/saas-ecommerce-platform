@@ -66,7 +66,7 @@ export default function ProdutoAcoes({ produtoId, onDeleteSuccess }: ProdutoAcoe
   const handleDelete = async () => {
     setIsDeleting(true);
     try {
-      const res = await fetch(`http://localhost:8080/api/produtos/${produtoId}`, {
+      const res = await fetch(`http://localhost:8081/api/produtos/${produtoId}`, {
         method: "DELETE",
         headers: { "X-Tenant-Slug": "minha-super-loja" }
       });
