@@ -18,13 +18,11 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
-    // Chave secreta de 256-bit (32 bytes) em Base64.
-    // O valor default permite rodar em desenvolvimento sem configuração extra.
-    // Em produção, isto será injetado através do application.properties ou variáveis de ambiente.
-    @Value("${security.jwt.secret-key:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}")
+    // A Chave Secreta e o Tempo de Expiração agora vêm do application.properties
+    @Value("${api.security.token.secret}")
     private String secretKey;
 
-    @Value("${security.jwt.expiration-time:86400000}") // Expiração padrão: 1 dia em milissegundos
+    @Value("${api.security.token.expiration}")
     private long jwtExpiration;
 
     public String extractUsername(String token) {
@@ -40,7 +38,6 @@ public class JwtService {
         return claimsResolver.apply(claims);
     }
 
-    // A injeção vital para arquiteturas Multi-Tenant
     public String generateToken(User user) {
         Map<String, Object> extraClaims = new HashMap<>();
         extraClaims.put("tenantId", user.getTenant().getId().toString());

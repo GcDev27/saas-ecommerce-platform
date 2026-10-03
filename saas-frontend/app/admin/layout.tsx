@@ -8,6 +8,7 @@ import {
   FileText, HelpCircle, Moon, Search, Plus, Bell, User,
   Menu, X
 } from 'lucide-react';
+import UserButton from '../components/UserButton';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -127,9 +128,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <span className="absolute top-2 right-2.5 w-2 h-2 bg-rose-500 rounded-full border-2 border-[#131316]"></span>
             </button>
             
-            <div className="w-10 h-10 bg-zinc-800 rounded-full flex items-center justify-center border border-zinc-700/50 cursor-pointer hover:border-zinc-500 transition-colors shrink-0">
-              <User className="w-5 h-5 text-zinc-400" />
-            </div>
+            <UserButton />
           </div>
         </header>
         

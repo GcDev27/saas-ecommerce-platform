@@ -1,0 +1,61 @@
+package com.example.saasecommerce.model;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+@Entity
+@Table(name = "variations")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Variation {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+
+    @Column(nullable = false)
+    private String name; // Ex: "FAKE 240 CROWNS - NÍVEL 6"
+
+    private BigDecimal price;
+    
+    @Column(name = "compare_at_price")
+    private BigDecimal compareAtPrice;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "delivery_type", nullable = false)
+    private DeliveryType deliveryType;
+
+    // Se a entrega for CHAT
+    @Column(name = "chat_initial_message", columnDefinition = "TEXT")
+    private String chatInitialMessage;
+
+    // Opções de estoque geral
+    @Column(name = "has_unlimited_stock")
+    private boolean hasUnlimitedStock;
+
+    @Column(name = "stock_quantity")
+    private Integer stockQuantity; // Usado se deliveryType for CHAT e não houver linhas
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id", nullable = false)
+    @JsonIgnore
+    private Product product;
+
+    @OneToMany(mappedBy = "variation", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<StockLine> stockLines = new ArrayList<>();
+
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+}

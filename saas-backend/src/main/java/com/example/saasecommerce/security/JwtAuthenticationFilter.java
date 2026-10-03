@@ -45,30 +45,36 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // 2. Extrair o token JWT (removendo os primeiros 7 caracteres: "Bearer ")
         jwt = authHeader.substring(7);
 
-        // 3. Extrair o email (username) do token
-        userEmail = jwtService.extractUsername(jwt);
+        try {
+            // 3. Extrair o email (username) do token
+            userEmail = jwtService.extractUsername(jwt);
 
-        // 4. Se temos um email válido e o utilizador ainda não está autenticado no contexto atual
-        if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            // 4. Se temos um email válido e o utilizador ainda não está autenticado no contexto atual
+            if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-            // Vai à base de dados buscar os detalhes reais do utilizador
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
+                // Vai à base de dados buscar os detalhes reais do utilizador
+                UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
 
-            // 5. Valida se o token pertence a este utilizador e se não expirou
-            if (jwtService.isTokenValid(jwt, userDetails)) {
+                // 5. Valida se o token pertence a este utilizador e se não expirou
+                if (jwtService.isTokenValid(jwt, userDetails)) {
 
-                // Cria o "Crachá de Acesso" do Spring Security
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        null,
-                        userDetails.getAuthorities()
-                );
+                    // Cria o "Crachá de Acesso" do Spring Security
+                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            null,
+                            userDetails.getAuthorities()
+                    );
 
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-                // 6. Coloca o crachá no Contexto de Segurança. A partir de agora, o Spring sabe quem ele é!
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+                    // 6. Coloca o crachá no Contexto de Segurança. A partir de agora, o Spring sabe quem ele é!
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                }
             }
+        } catch (Exception e) {
+            // O token é inválido, expirou ou está malformado (ex: "null", "undefined").
+            // Não estouramos erro 500, simplesmente não autenticamos. O Spring Security cuidará de bloquear o acesso se a rota exigir auth.
+            System.err.println("Falha ao processar token JWT: " + e.getMessage());
         }
 
         // Continua o fluxo normal da requisição

@@ -27,17 +27,13 @@ public class Product {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    private BigDecimal price;
-
     private String slug;
 
     private String visibility;
 
-    @Column(name = "has_stock")
-    private boolean hasStock;
-
-    @Column(name = "stock_quantity")
-    private Integer stockQuantity;
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private java.util.List<Variation> variations = new java.util.ArrayList<>();
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

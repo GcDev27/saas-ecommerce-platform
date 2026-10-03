@@ -4,8 +4,8 @@ Content-Type: application/json
 
 {
   "name": "Giancarlo",
-  "email": "admin@minhasloja.com",
-  "password": "senha-super-segura"
+  "email": "admin2@minhasloja.com",
+  "password": "senhass-super-segura"
 }
 
 ### 2. Fazer Login
@@ -13,8 +13,8 @@ POST http://localhost:8081/api/auth/login
 Content-Type: application/json
 
 {
-  "email": "admin@minhaloja.com",
-  "password": "senha-super-segura"
+  "email": "admin2@minhasloja.com",
+  "password": "senhass-super-segura"
 }
 ### 3. Cadastrar Produto na Loja (Seguro)
 POST http://localhost:8081/api/produtos

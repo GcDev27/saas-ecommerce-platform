@@ -40,11 +40,8 @@ public class ProductService {
 
         produto.setName(detalhes.getName());
         produto.setDescription(detalhes.getDescription());
-        produto.setPrice(detalhes.getPrice());
         produto.setSlug(detalhes.getSlug());
         produto.setVisibility(detalhes.getVisibility());
-        produto.setHasStock(detalhes.isHasStock());
-        produto.setStockQuantity(detalhes.getStockQuantity());
 
         return productRepository.save(produto);
     }

@@ -12,6 +12,11 @@ export default function ProdutosPage() {
   useEffect(() => {
     const token = localStorage.getItem("saas_token");
     
+    if (!token || token === "null" || token === "undefined") {
+      window.location.href = "/login";
+      return;
+    }
+
     // Rota NOVA e corrigida apontando para o Spring Boot
     fetch("http://localhost:8081/api/admin/produtos", {
       method: "GET",
