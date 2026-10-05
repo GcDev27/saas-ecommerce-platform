@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import ProdutoAcoes from "./ProdutoAcoes";
+import { getToken } from "../../lib/auth";
+import { authFetch } from "../../lib/auth";
 
 export default function ProdutosPage() {
   const [produtos, setProdutos] = useState<any[]>([]);
@@ -10,21 +12,14 @@ export default function ProdutosPage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const token = localStorage.getItem("saas_token");
+    const token = getToken();
     
-    if (!token || token === "null" || token === "undefined") {
+    if (!token) {
       window.location.href = "/login";
       return;
     }
 
-    // Rota NOVA e corrigida apontando para o Spring Boot
-    fetch("http://localhost:8081/api/admin/produtos", {
-      method: "GET",
-      headers: {
-        "Authorization": `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    })
+    authFetch("/api/admin/produtos")
       .then((res) => {
         if (!res.ok) throw new Error("Falha ao buscar produtos");
         return res.json();
@@ -56,7 +51,7 @@ export default function ProdutosPage() {
         </Link>
       </div>
 
-      {loading && <p className="text-neutral-400">A carregar produtos da base de dados...</p>}
+      {loading && <p className="text-neutral-400">Carregando produtos...</p>}
       {error && <p className="text-red-500">{error}</p>}
 
       {!loading && !error && (
@@ -74,17 +69,13 @@ export default function ProdutosPage() {
                     📦
                   </div>
                   <div className="flex flex-col">
-                    <span className="font-semibold text-white">{produto.name}</span>
+                    <Link href={`/admin/produtos/${produto.id}`} className="font-semibold text-white hover:text-violet-400 transition-colors">
+                      {produto.name}
+                    </Link>
                     <div className="flex gap-2 mt-1.5">
-                      {produto.hasStock ? (
-                        <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-emerald-900/30 text-emerald-400 border border-emerald-800/50">
-                          {produto.stockQuantity} EM ESTOQUE
-                        </span>
-                      ) : (
-                        <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-red-900/30 text-red-400 border border-red-800/50">
-                          SEM CONTROLO DE STOCK
-                        </span>
-                      )}
+                      <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-violet-900/30 text-violet-400 border border-violet-800/50">
+                        {produto.variations?.length || 0} variações
+                      </span>
                       <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-neutral-800 text-neutral-400 border border-neutral-700">
                         {produto.visibility === 'VISIBLE' ? 'VISÍVEL NA LOJA' : 'OCULTO'}
                       </span>
@@ -92,12 +83,6 @@ export default function ProdutosPage() {
                   </div>
                 </div>
                 <div className="flex items-center gap-6">
-                  <div className="text-right">
-                    <span className="text-xs text-neutral-500 block mb-0.5">Preço</span>
-                    <span className="font-semibold text-white">
-                      R$ {produto.price ? produto.price.toFixed(2).replace('.', ',') : '0,00'}
-                    </span>
-                  </div>
                  <ProdutoAcoes 
                    produtoId={produto.id} 
                    onDeleteSuccess={(id) => setProdutos(produtos.filter(p => p.id !== id))} 

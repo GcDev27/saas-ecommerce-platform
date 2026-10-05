@@ -18,7 +18,6 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
-    // A Chave Secreta e o Tempo de Expiração agora vêm do application.properties
     @Value("${api.security.token.secret}")
     private String secretKey;
 
@@ -40,8 +39,12 @@ public class JwtService {
 
     public String generateToken(User user) {
         Map<String, Object> extraClaims = new HashMap<>();
-        extraClaims.put("tenantId", user.getTenant().getId().toString());
-        extraClaims.put("role", "ROLE_" + user.getRole().name());
+
+        // CORREÇÃO: Extrai o tenantId diretamente, pois a entidade User agora guarda apenas o UUID
+        extraClaims.put("tenantId", user.getTenantId().toString());
+
+        // CORREÇÃO: Define a role padrão, uma vez que simplificámos a entidade User
+        extraClaims.put("role", "ROLE_USER");
 
         return generateToken(extraClaims, user);
     }

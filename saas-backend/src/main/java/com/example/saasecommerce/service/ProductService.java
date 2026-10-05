@@ -1,54 +1,81 @@
 package com.example.saasecommerce.service;
 
 import com.example.saasecommerce.model.Product;
-import com.example.saasecommerce.model.Tenant;
 import com.example.saasecommerce.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class ProductService {
 
     private final ProductRepository productRepository;
-    private final TenantService tenantService;
 
-    // Criar (CREATE) - Admin Seguro
-    public Product createProduct(Tenant tenant, Product product) {
-        product.setTenant(tenant);
+    // Criar (CREATE)
+    public Product createProduct(UUID tenantId, Product product) {
+        product.setTenantId(tenantId);
+        
+        com.example.saasecommerce.model.Variation defaultVariation = com.example.saasecommerce.model.Variation.builder()
+                .name("Padrão")
+                .price(java.math.BigDecimal.ZERO)
+                .deliveryType(com.example.saasecommerce.model.DeliveryType.AUTOMATIC_LINES)
+                .hasUnlimitedStock(false)
+                .stockQuantity(0)
+                .product(product)
+                .build();
+                
+        if (product.getVariations() == null) {
+            product.setVariations(new java.util.ArrayList<>());
+        }
+        product.getVariations().add(defaultVariation);
+        
         return productRepository.save(product);
     }
 
-    // Ler / Listar (READ) - Admin Seguro
-    public List<Product> getProductsByTenant(Tenant tenant) {
-        return productRepository.findAllByTenantId(tenant.getId());
+    // Ler / Listar (READ)
+    public List<Product> getProductsByTenant(UUID tenantId) {
+        return productRepository.findAllByTenantId(tenantId);
     }
 
-    // Ler um único produto por ID - Admin Seguro
-    public Product getProductById(UUID id, Tenant tenant) {
-        return productRepository.findByIdAndTenantId(id, tenant.getId())
+    // Listar somente os visíveis (para a vitrine pública)
+    public List<Product> getProductsByTenantAndVisibility(UUID tenantId, String visibility) {
+        return productRepository.findAllByTenantIdAndVisibility(tenantId, visibility);
+    }
+
+    // Buscar por slug (para página de detalhe do produto)
+    public Product getProductBySlugAndTenant(String slug, UUID tenantId) {
+        return productRepository.findBySlugAndTenantId(slug, tenantId)
+                .orElseThrow(() -> new IllegalArgumentException("Produto não encontrado"));
+    }
+
+    // Ler um único produto por ID
+    public Product getProductById(UUID id, UUID tenantId) {
+        return productRepository.findByIdAndTenantId(id, tenantId)
                 .orElseThrow(() -> new IllegalArgumentException("Produto não encontrado ou não pertence a esta loja"));
     }
 
-    // Atualizar (UPDATE) - Admin Seguro
-    public Product updateProduct(UUID id, Tenant tenant, Product detalhes) {
-        Product produto = getProductById(id, tenant); // Já verifica se pertence ao tenant!
+    // Atualizar (UPDATE)
+    public Product updateProduct(UUID id, UUID tenantId, Product detalhes) {
+        Product produto = getProductById(id, tenantId);
 
         produto.setName(detalhes.getName());
         produto.setDescription(detalhes.getDescription());
         produto.setSlug(detalhes.getSlug());
         produto.setVisibility(detalhes.getVisibility());
 
+        produto.setCategoryName(detalhes.getCategoryName());
+        produto.setImageUrl(detalhes.getImageUrl());
+
         return productRepository.save(produto);
     }
 
-    // Apagar (DELETE) - Admin Seguro
-    public void deleteProduct(UUID id, Tenant tenant) {
-        Product produto = getProductById(id, tenant); // Garante que pertence
+    // Apagar (DELETE)
+    public void deleteProduct(UUID id, UUID tenantId) {
+        Product produto = getProductById(id, tenantId);
         productRepository.delete(produto);
     }
 }

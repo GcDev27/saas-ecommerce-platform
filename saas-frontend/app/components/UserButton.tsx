@@ -2,16 +2,41 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, Settings, LogOut, Store } from 'lucide-react';
+import { User, Settings, LogOut, Store, ExternalLink } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { removeToken } from '../lib/auth';
 
 export default function UserButton() {
   const [isOpen, setIsOpen] = useState(false);
+  const [userEmail, setUserEmail] = useState('Carregando...');
+  const [tenantSlug, setTenantSlug] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
-  // Close dropdown when clicking outside
   useEffect(() => {
+    // 1. Extrai o e-mail real e tenta extrair o slug decodificando o Token JWT
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const payloadBase64 = token.split('.')[1];
+        const decodedJson = atob(payloadBase64.replace(/-/g, '+').replace(/_/g, '/'));
+        const payload = JSON.parse(decodedJson);
+        
+        setUserEmail(payload.sub || payload.email || 'Usuário');
+        
+        // 2. Busca o slug da loja. 
+        // Caso no futuro você adicione o slug dentro do JWT, ele já vai ler daqui.
+        // Se não, ele tenta resgatar do localStorage.
+        const slug = payload.tenantSlug || localStorage.getItem('tenant_slug');
+        if (slug) {
+          setTenantSlug(slug);
+        }
+      } catch (e) {
+        setUserEmail('Erro ao ler perfil');
+      }
+    }
+
+    // Fecha o menu ao clicar fora dele[cite: 13]
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsOpen(false);
@@ -22,10 +47,24 @@ export default function UserButton() {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem('saas_token');
+    removeToken();
     localStorage.removeItem('tenant_slug');
     localStorage.removeItem('tenant_id');
     router.push('/login');
+  };
+
+  // Função para abrir a loja do cliente
+  const handleOpenStore = () => {
+    if (tenantSlug) {
+      // Abre em uma nova aba. 
+      // IMPORTANTE: Ajuste a URL abaixo dependendo de como seu frontend exibe a loja.
+      // Exemplo se for subdomínio: window.open(`http://${tenantSlug}.localhost:3000`, '_blank');
+      // Exemplo se for em rota: window.open(`/loja/${tenantSlug}`, '_blank');
+      window.open(`/loja/${tenantSlug}`, '_blank');
+      setIsOpen(false);
+    } else {
+      alert('A URL da sua loja ainda não está sincronizada. Por favor, saia e faça login novamente.');
+    }
   };
 
   return (
@@ -48,13 +87,21 @@ export default function UserButton() {
           >
             <div className="px-4 py-3 border-b border-zinc-800/60 mb-1">
               <p className="text-sm font-medium text-white">Minha Conta</p>
-              <p className="text-xs text-zinc-500 truncate mt-0.5">lojista@exemplo.com</p>
+              <p className="text-xs text-zinc-500 truncate mt-0.5">{userEmail}</p>
             </div>
             
-            <button className="w-full flex items-center px-4 py-2.5 text-sm text-zinc-400 hover:text-white hover:bg-zinc-800/50 transition-colors">
-              <Store className="w-4 h-4 mr-3" />
-              Minha Loja
+            {/* Botão de abrir a loja atualizado */}
+            <button 
+              onClick={handleOpenStore}
+              className="w-full flex items-center justify-between px-4 py-2.5 text-sm text-zinc-400 hover:text-white hover:bg-zinc-800/50 transition-colors"
+            >
+              <div className="flex items-center">
+                <Store className="w-4 h-4 mr-3" />
+                Minha Loja
+              </div>
+              <ExternalLink className="w-3.5 h-3.5 opacity-40" />
             </button>
+
             <button className="w-full flex items-center px-4 py-2.5 text-sm text-zinc-400 hover:text-white hover:bg-zinc-800/50 transition-colors">
               <Settings className="w-4 h-4 mr-3" />
               Configurações

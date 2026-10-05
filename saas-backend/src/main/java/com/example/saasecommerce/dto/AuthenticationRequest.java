@@ -1,13 +1,15 @@
 package com.example.saasecommerce.dto;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-public record AuthenticationRequest(
-        @NotBlank(message = "O e-mail é obrigatório")
-        @Email(message = "E-mail inválido")
-        String email,
-
-        @NotBlank(message = "A senha é obrigatória")
-        String password
-) {}
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class AuthenticationRequest {
+        private String email;
+        private String password;
+}

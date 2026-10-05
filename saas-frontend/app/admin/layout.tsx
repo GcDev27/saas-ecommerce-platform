@@ -1,26 +1,44 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { 
   LayoutDashboard, ShoppingBag, Package, Users, 
-  FileText, HelpCircle, Moon, Search, Plus, Bell, User,
-  Menu, X
+  FileText, HelpCircle, Moon, Search, Plus, Bell,
+  Menu, X, Settings
 } from 'lucide-react';
 import UserButton from '../components/UserButton';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
+  
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isAuthorized, setIsAuthorized] = useState(false);
 
+  // Verificação de segurança: Checa se o usuário tem o token ao carregar a página
   useEffect(() => {
+    const token = localStorage.getItem('token');
+    
+    if (!token) {
+      router.push('/login');
+    } else {
+      setIsAuthorized(true);
+    }
+    
     setIsMobileMenuOpen(false);
-  }, [pathname]);
+  }, [pathname, router]);
+
+  // Enquanto verifica o login, mostra uma tela vazia para não vazar a interface
+  if (!isAuthorized) {
+    return <div className="min-h-screen bg-[#131316] flex items-center justify-center text-zinc-500">Validando sessão...</div>;
+  }
 
   const navItems = [
     { name: 'Visão Geral', href: '/admin', icon: LayoutDashboard },
     { name: 'Produtos', href: '/admin/produtos', icon: Package },
+    { name: 'Configurações', href: '/admin/configuracoes', icon: Settings },
     { name: 'Clientes', href: '#clientes', icon: Users },
     { name: 'Pedidos', href: '#pedidos', icon: ShoppingBag },
     { name: 'Relatórios', href: '#relatorios', icon: FileText },
@@ -42,7 +60,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
         
-        {/* Cabeçalho da Sidebar (Logo GC removido, visual mais limpo) */}
         <div className="h-20 flex items-center justify-between px-6 border-b border-zinc-800/30">
           <span className="text-xl font-semibold tracking-wide text-zinc-100">Painel Admin</span>
           <button 

@@ -19,23 +19,50 @@ public class TenantController {
 
     // DTOs para organizar a entrada e a saída
     public record TenantRequestDTO(String name, String slug) {}
-    public record TenantResponseDTO(UUID id, String name, String slug) {}
+    public record TenantUpdateDTO(String theme, String primaryColor, String font, String heroTitle, String heroDescription, String logoUrl) {}
+    public record TenantResponseDTO(UUID id, String name, String slug, String theme, String primaryColor, String font, String heroTitle, String heroDescription, String logoUrl) {}
 
     // Rota POST: Cria a loja (O Next.js vai chamar isso ao cadastrar um cliente)
     @PostMapping
     public ResponseEntity<TenantResponseDTO> createTenant(@RequestBody TenantRequestDTO request) {
         Tenant tenant = tenantService.createTenant(request.name(), request.slug());
-
-        TenantResponseDTO response = new TenantResponseDTO(tenant.getId(), tenant.getName(), tenant.getSlug());
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(mapToDto(tenant));
     }
 
     // Rota GET: Busca a loja pelo slug (O Next.js vai chamar isso para carregar a vitrine)
     @GetMapping("/{slug}")
     public ResponseEntity<TenantResponseDTO> getTenantBySlug(@PathVariable String slug) {
         Tenant tenant = tenantService.getTenantBySlug(slug);
+        return ResponseEntity.ok(mapToDto(tenant));
+    }
 
-        TenantResponseDTO response = new TenantResponseDTO(tenant.getId(), tenant.getName(), tenant.getSlug());
-        return ResponseEntity.ok(response);
+    // Rota GET: Busca a loja pelo ID (O Next.js vai chamar isso no painel admin)
+    @GetMapping("/id/{id}")
+    public ResponseEntity<TenantResponseDTO> getTenantById(@PathVariable UUID id) {
+        Tenant tenant = tenantService.getTenantById(id);
+        return ResponseEntity.ok(mapToDto(tenant));
+    }
+
+    // Rota GET: Busca a loja do usuário autenticado
+    @GetMapping("/me")
+    public ResponseEntity<TenantResponseDTO> getMyTenant(org.springframework.security.core.Authentication authentication) {
+        com.example.saasecommerce.model.User user = (com.example.saasecommerce.model.User) authentication.getPrincipal();
+        Tenant tenant = tenantService.getTenantById(user.getTenantId());
+        return ResponseEntity.ok(mapToDto(tenant));
+    }
+
+    // Rota PUT: Atualiza as configurações da loja do usuário autenticado
+    @PutMapping("/me")
+    public ResponseEntity<TenantResponseDTO> updateMyTenant(@RequestBody TenantUpdateDTO request, org.springframework.security.core.Authentication authentication) {
+        com.example.saasecommerce.model.User user = (com.example.saasecommerce.model.User) authentication.getPrincipal();
+        Tenant updatedTenant = tenantService.updateTenantSettings(
+            user.getTenantId(), request.theme(), request.primaryColor(), request.font(), 
+            request.heroTitle(), request.heroDescription(), request.logoUrl()
+        );
+        return ResponseEntity.ok(mapToDto(updatedTenant));
+    }
+
+    private TenantResponseDTO mapToDto(Tenant t) {
+        return new TenantResponseDTO(t.getId(), t.getName(), t.getSlug(), t.getTheme(), t.getPrimaryColor(), t.getFont(), t.getHeroTitle(), t.getHeroDescription(), t.getLogoUrl());
     }
 }

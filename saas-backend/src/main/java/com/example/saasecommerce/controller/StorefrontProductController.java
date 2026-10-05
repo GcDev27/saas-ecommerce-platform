@@ -19,18 +19,24 @@ public class StorefrontProductController {
     private final ProductService productService;
     private final TenantService tenantService;
 
-    // Rota pública para listar todos os produtos visíveis de uma vitrine específica
+    // Lista todos os produtos visíveis da loja
     @GetMapping
     public ResponseEntity<List<Product>> listarProdutosDaVitrine(
             @RequestHeader("X-Tenant-Slug") String tenantSlug) {
 
-        // 1. Validar se a loja existe pelo slug
         Tenant tenant = tenantService.getTenantBySlug(tenantSlug);
-        
-        // 2. Retornar os produtos daquela loja
-        List<Product> produtos = productService.getProductsByTenant(tenant);
-        
-        // Em um cenário real, também filtraríamos aqui produtos ocultos (visibility != "PUBLIC") ou sem estoque
+        List<Product> produtos = productService.getProductsByTenantAndVisibility(tenant.getId(), "VISIBLE");
         return ResponseEntity.ok(produtos);
+    }
+
+    // Busca um único produto pelo slug (para a página de detalhe)
+    @GetMapping("/{productSlug}")
+    public ResponseEntity<Product> obterProdutoPorSlug(
+            @RequestHeader("X-Tenant-Slug") String tenantSlug,
+            @PathVariable String productSlug) {
+
+        Tenant tenant = tenantService.getTenantBySlug(tenantSlug);
+        Product produto = productService.getProductBySlugAndTenant(productSlug, tenant.getId());
+        return ResponseEntity.ok(produto);
     }
 }

@@ -14,60 +14,49 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/admin/produtos")
-@CrossOrigin(origins = "*")
 @RequiredArgsConstructor
 public class AdminProductController {
 
     private final ProductService productService;
 
-    // POST: /api/admin/produtos
     @PostMapping
     public ResponseEntity<Product> criarProduto(
             @AuthenticationPrincipal User currentUser,
             @RequestBody Product product) {
-
-        // Extraímos o Tenant ID diretamente do usuário logado (segurança máxima!)
-        Product novoProduto = productService.createProduct(currentUser.getTenant(), product);
+        // Extraímos o Tenant ID diretamente do utilizador logado
+        Product novoProduto = productService.createProduct(currentUser.getTenantId(), product);
         return ResponseEntity.status(HttpStatus.CREATED).body(novoProduto);
     }
 
-    // GET: /api/admin/produtos
     @GetMapping
     public ResponseEntity<List<Product>> listarProdutos(
             @AuthenticationPrincipal User currentUser) {
-
-        List<Product> produtos = productService.getProductsByTenant(currentUser.getTenant());
+        List<Product> produtos = productService.getProductsByTenant(currentUser.getTenantId());
         return ResponseEntity.ok(produtos);
     }
 
-    // GET: /api/admin/produtos/{id}
     @GetMapping("/{id}")
     public ResponseEntity<Product> obterProduto(
             @PathVariable UUID id,
             @AuthenticationPrincipal User currentUser) {
-
-        Product produto = productService.getProductById(id, currentUser.getTenant());
+        Product produto = productService.getProductById(id, currentUser.getTenantId());
         return ResponseEntity.ok(produto);
     }
 
-    // PUT: /api/admin/produtos/{id}
     @PutMapping("/{id}")
     public ResponseEntity<Product> atualizarProduto(
             @PathVariable UUID id,
             @AuthenticationPrincipal User currentUser,
-            @RequestBody Product productDetails) {
-
-        Product atualizado = productService.updateProduct(id, currentUser.getTenant(), productDetails);
+            @RequestBody Product product) {
+        Product atualizado = productService.updateProduct(id, currentUser.getTenantId(), product);
         return ResponseEntity.ok(atualizado);
     }
 
-    // DELETE: /api/admin/produtos/{id}
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> apagarProduto(
+    public ResponseEntity<Void> deletarProduto(
             @PathVariable UUID id,
             @AuthenticationPrincipal User currentUser) {
-
-        productService.deleteProduct(id, currentUser.getTenant());
+        productService.deleteProduct(id, currentUser.getTenantId());
         return ResponseEntity.noContent().build();
     }
 }

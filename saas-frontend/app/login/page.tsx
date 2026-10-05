@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
+import { Eye, EyeOff } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -13,6 +14,7 @@ export default function LoginPage() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -44,8 +46,8 @@ export default function LoginPage() {
         throw new Error('E-mail ou senha inválidos.');
       }
 
-      // Store token (in a real app, prefer HttpOnly cookies)
-      localStorage.setItem('saas_token', data.token);
+      // CORREÇÃO: Salvar como 'token' para o resto do sistema conseguir ler
+      localStorage.setItem('token', data.token);
       
       // Redirect to admin dashboard
       router.push('/admin');
@@ -101,20 +103,26 @@ export default function LoginPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-neutral-300 mb-2">
-                  Senha
-                </label>
-                <input
-                  type="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  placeholder="Sua senha"
-                  required
-                  className="w-full bg-[#16161a] border border-neutral-800 rounded-xl px-4 py-3.5 text-white text-sm placeholder-neutral-600 focus:outline-none focus:border-violet-400 focus:ring-1 focus:ring-violet-400 transition-all"
-                />
-              </div>
-
+  <label className="block text-sm font-medium text-neutral-300 mb-2">Senha</label>
+  <div className="relative">
+    <input
+      type={showPassword ? 'text' : 'password'}
+      name="password"
+      value={formData.password}
+      onChange={handleChange}
+      placeholder="Digite sua senha"
+      required
+      className="w-full bg-[#16161a] border border-neutral-800 rounded-xl px-4 py-3.5 pr-10 text-white text-sm placeholder-neutral-600 focus:outline-none focus:border-violet-400 focus:ring-1 focus:ring-violet-400 transition-all"
+    />
+      <button
+        type="button"
+        onClick={() => setShowPassword(!showPassword)}
+        className="absolute inset-y-0 right-0 pr-3 flex items-center text-neutral-500 hover:text-neutral-300"
+     >
+        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+      </button>
+    </div>
+    </div>
               <button
                 type="submit"
                 disabled={loading}

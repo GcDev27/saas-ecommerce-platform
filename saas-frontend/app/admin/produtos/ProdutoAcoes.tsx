@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { useToast } from "../../components/Toast";
+import { getToken, authFetch } from "../../lib/auth";
 
 interface ProdutoAcoesProps {
   produtoId: number;
@@ -66,10 +67,9 @@ export default function ProdutoAcoes({ produtoId, onDeleteSuccess }: ProdutoAcoe
   const handleDelete = async () => {
     setIsDeleting(true);
     try {
-      const token = localStorage.getItem("saas_token");
-      const res = await fetch(`http://localhost:8081/api/admin/produtos/${produtoId}`, {
-        method: "DELETE",
-        headers: { "Authorization": `Bearer ${token}` }
+      const token = getToken();
+      const res = await authFetch(`/api/admin/produtos/${produtoId}`, {
+        method: "DELETE"
       });
       
       if (res.ok) {

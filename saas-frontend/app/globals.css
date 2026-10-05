@@ -1,20 +1,134 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
+/* ─────────────────────────────────────────────────────────────────
+   CSS Variables — Design System Base
+───────────────────────────────────────────────────────────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg-primary: #09090b;
+  --bg-secondary: #111113;
+  --bg-card: #1a1a1e;
+  --text-primary: #ffffff;
+  --text-secondary: #a3a3a3;
+  --text-muted: #52525b;
+  --color-brand: #8b5cf6;
+  --color-brand-hover: #7c3aed;
+  --border-color: rgba(255, 255, 255, 0.06);
+  --border-hover: rgba(255, 255, 255, 0.12);
+  --shadow-brand: 0 0 40px -8px var(--color-brand);
+  --radius-card: 20px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ─────────────────────────────────────────────────────────────────
+   TEMA 1: Dark Premium (Glassmorphism) — Inspiração Vercel/Linear
+   Visual: Fundo quase preto, cards translúcidos, luz ambiente
+───────────────────────────────────────────────────────────────── */
+.theme-glass {
+  --bg-primary: #09090b;
+  --bg-secondary: rgba(255,255,255,0.03);
+  --bg-card: rgba(255,255,255,0.04);
+  --text-primary: #fafafa;
+  --text-secondary: #a1a1aa;
+  --text-muted: #52525b;
+  --border-color: rgba(255, 255, 255, 0.07);
+  --border-hover: rgba(255, 255, 255, 0.14);
+  --color-brand: var(--store-primary-color, #8b5cf6);
+  --shadow-brand: 0 0 60px -10px var(--color-brand);
+  --header-bg: rgba(9,9,11,0.7);
+  --card-hover-shadow: 0 16px 64px -16px var(--color-brand);
 }
 
+/* ─────────────────────────────────────────────────────────────────
+   TEMA 2: Clean Light — Inspiração Apple/Shopify/Notion
+   Visual: Fundo branco puro, sombras suaves, tipografia forte
+───────────────────────────────────────────────────────────────── */
+.theme-light {
+  --bg-primary: #f8f8f8;
+  --bg-secondary: #ffffff;
+  --bg-card: #ffffff;
+  --text-primary: #111111;
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
+  --border-color: rgba(0, 0, 0, 0.08);
+  --border-hover: rgba(0, 0, 0, 0.15);
+  --color-brand: var(--store-primary-color, #2563eb);
+  --shadow-brand: 0 8px 32px -4px rgba(0,0,0,0.15);
+  --header-bg: rgba(248,248,248,0.85);
+  --card-hover-shadow: 0 12px 40px -8px rgba(0,0,0,0.15);
+  --radius-card: 16px;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   TEMA 3: Gamer/Neon — Inspiração Razer/Epic Games/Riot
+   Visual: Preto absoluto, bordas neon brilhantes, efeito escaneamento
+───────────────────────────────────────────────────────────────── */
+.theme-gamer {
+  --bg-primary: #020204;
+  --bg-secondary: #07070c;
+  --bg-card: #0c0c14;
+  --text-primary: #e2e8ff;
+  --text-secondary: #7c85a8;
+  --text-muted: #4a5070;
+  --border-color: rgba(var(--brand-rgb, 34, 197, 94), 0.2);
+  --border-hover: rgba(var(--brand-rgb, 34, 197, 94), 0.5);
+  --color-brand: var(--store-primary-color, #22c55e);
+  --shadow-brand: 0 0 50px -5px var(--color-brand);
+  --header-bg: rgba(2,2,4,0.9);
+  --card-hover-shadow: 0 0 40px -8px var(--color-brand);
+  --radius-card: 8px;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   Global Body
+───────────────────────────────────────────────────────────────── */
 body {
-  color: var(--foreground);
-  background: var(--background);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
   font-family: Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
+
+/* ─────────────────────────────────────────────────────────────────
+   Glassmorphism Header (usado no theme-glass)
+───────────────────────────────────────────────────────────────── */
+.theme-glass .store-header {
+  background: var(--header-bg);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid var(--border-color);
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   Gamer theme: scanline efeito
+───────────────────────────────────────────────────────────────── */
+.theme-gamer::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.05) 2px,
+    rgba(0,0,0,0.05) 4px
+  );
+  pointer-events: none;
+  z-index: 999;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   Scrollbar elegante
+───────────────────────────────────────────────────────────────── */
+.custom-scrollbar::-webkit-scrollbar { width: 4px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 4px; }
+.custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.15); }
+
+/* ─────────────────────────────────────────────────────────────────
+   Utilitários de tema
+───────────────────────────────────────────────────────────────── */
+.bg-theme-card { background-color: var(--bg-card); border: 1px solid var(--border-color); }
+.text-theme-brand { color: var(--color-brand); }
+.bg-theme-brand { background-color: var(--color-brand); }
+.border-theme { border-color: var(--border-color); }
